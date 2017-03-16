@@ -1,0 +1,81 @@
+# Hops_WebCrawler
+Sub webcrawler()
+    Dim ie As Object
+    Dim objCollection As Object
+    Dim objElement As Object
+    Dim i As Variant
+    Dim j As Variant
+    Dim count As Integer
+    Dim class_anterior As String
+    Dim n_hop As Integer
+    Dim linha As Integer
+    Dim coluna As Integer
+    
+    'cria o objeto IE
+    Set ie = CreateObject("InternetExplorer.Application")
+    ie.Visible = False
+    
+    'vai pra página
+    ie.Navigate "https://ychhops.com/varieties/"
+    
+    'enquanto não carrega, espera
+    Do While ie.busy
+        DoEvents
+    Loop
+    
+    Set objCollection = ie.document.getElementsByTagName("div") 'pega o nome e o tipo
+    Set objElement = ie.document.getElementsByTagName("li") 'pega as infos do lupulos
+        
+    Debug.Print Len(objElement)
+        
+    tamanho = Len(objCollection)
+    '<div class="card__type">
+       
+  
+        linha = 1
+        For Each i In objCollection
+            coluna = 1
+                'Qual o Tipo de lupulo
+            If i.classname = "card__type" And class_anterior <> "card__front" Then
+                Cells(linha + 1, 2).Select
+                ActiveCell.FormulaR1C1 = i.innertext
+                Debug.Print i.innertext
+                'Debug.Print Len(i.innertext)
+            End If
+                
+            'nome do lupulo
+            If i.classname = "card__name" And class_anterior = "card__type" Then
+                coluna = coluna + 1
+                Cells(linha + 1, 1).Select
+                ActiveCell.FormulaR1C1 = i.innertext
+                Debug.Print i.innertext
+                            
+                'Se eu acho o nome eu percorro o codigo pra achar as caracteristicas
+                count = 0
+                n_hop = 1
+                
+                For Each j In objElement
+                    'Debug.Print InStr(j.innertext, ":")
+                    If linha * 6 = n_hop Then ''And Left(j.innertext, InStr(j.innertext, ":")) = "Region"
+                        If InStr(j.innertext, ":") > 0 Then
+                            coluna = coluna + 1
+                            Cells(linha + 1, coluna).Select
+                            ActiveCell.FormulaR1C1 = j.innertext
+                            Debug.Print j.classname
+                            Debug.Print j.innertext
+                            count = count + 1
+                        End If
+                    Else
+                        n_hop = n_hop + 1
+                    End If
+                    'se ele já tiver inserido os elementos sai do for
+                    If count > 5 Then
+                        linha = linha + 1
+                        Exit For
+                    End If
+                Next j
+            End If
+            class_anterior = i.classname
+        Next i
+    
+End Sub
