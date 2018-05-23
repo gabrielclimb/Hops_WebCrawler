@@ -11,14 +11,14 @@ Sub webcrawler()
     Dim linha As Integer
     Dim coluna As Integer
     
-    'cria o objeto IE
+    'Create IE Object
     Set ie = CreateObject("InternetExplorer.Application")
     ie.Visible = False
     
-    'vai pra página
+    'Go to
     ie.Navigate "https://ychhops.com/varieties/"
     
-    'enquanto não carrega, espera
+    'Wait to load
     Do While ie.busy
         DoEvents
     Loop
@@ -35,7 +35,7 @@ Sub webcrawler()
         linha = 1
         For Each i In objCollection
             coluna = 1
-                'Qual o Tipo de lupulo
+                'Quat Hop's Type
             If i.classname = "card__type" And class_anterior <> "card__front" Then
                 Cells(linha + 1, 2).Select
                 ActiveCell.FormulaR1C1 = i.innertext
@@ -43,14 +43,14 @@ Sub webcrawler()
                 'Debug.Print Len(i.innertext)
             End If
                 
-            'nome do lupulo
+            'Hop's Name
             If i.classname = "card__name" And class_anterior = "card__type" Then
                 coluna = coluna + 1
                 Cells(linha + 1, 1).Select
                 ActiveCell.FormulaR1C1 = i.innertext
                 Debug.Print i.innertext
                             
-                'Se eu acho o nome eu percorro o codigo pra achar as caracteristicas
+                'If I find a hop name, go into that to get the info/data
                 count = 0
                 n_hop = 1
                 
@@ -68,7 +68,7 @@ Sub webcrawler()
                     Else
                         n_hop = n_hop + 1
                     End If
-                    'se ele já tiver inserido os elementos sai do for
+                    'If I've already took that hop, get out of this for
                     If count > 5 Then
                         linha = linha + 1
                         Exit For
